@@ -1,0 +1,29 @@
+# --- Go ----------------------------------------------------------------
+# Compiled binaries (we don't commit prebuilt binaries; users `go build`).
+metrics-monitor
+metrics-monitor.exe
+*.test
+*.prof
+coverage.out
+coverage.html
+
+# Vendor dir if anyone runs `go mod vendor` locally.
+/vendor/
+
+# --- OS / editors ------------------------------------------------------
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+*.swp
+*~
+
+# --- Local runtime ----------------------------------------------------
+# Logs / temp output a user might capture while developing.
+/tmp/
+*.log
+
+# Local config overrides (the canonical config is config/metrics-monitor.toml,
+# which is committed; ad-hoc overrides for local testing go here).
+config/local.toml
+config/*.local.toml

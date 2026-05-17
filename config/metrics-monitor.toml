@@ -1,0 +1,68 @@
+# metrics-monitor — default configuration.
+#
+# Each section maps directly to a runtime construct:
+#   [agent]          — pipeline-wide knobs
+#   [[inputs.<n>]]   — one input plugin instance (repeat for multi-instance)
+#   [[outputs.<n>]]  — one output plugin instance
+
+[agent]
+# Buffer size between input emits and the fan-out goroutine.
+metric_channel_size = 1000
+# Log level for the agent's own logs: debug | info | warn | error.
+log_level = "info"
+
+
+# ----- inputs ---------------------------------------------------------
+
+[[inputs.cpu]]
+# How often the agent calls cpu.Gather. Percentages are computed from
+# the delta between two consecutive gathers — there's no blocking
+# sample window, so the value here is just "how fresh you want the data".
+interval = "1s"
+
+# Emit one metric per logical CPU (cpu="cpu0", "cpu1", ...).
+percpu = true
+
+# Also emit one aggregate metric tagged cpu="cpu-total".
+totalcpu = true
+
+# Emit cumulative time_* counters (seconds spent in each mode).
+collect_cpu_time = true
+
+# Emit usage_* gauges (percentages computed from delta).
+collect_usage = true
+
+# Emit cpu_info gauge — model name, vendor, cores, MHz, cache size.
+# Static-ish, so duplicates between gathers; consumer can dedupe.
+collect_cpu_info = true
+
+
+# ----- outputs --------------------------------------------------------
+
+[[outputs.file]]
+# "stdout" / "stderr" route to terminal streams; any other value is
+# treated as a file path opened with O_APPEND|O_CREATE.
+path = "stdout"
+
+# How often the agent drains the output's buffer.
+flush_interval = "1s"
+
+# Maximum metrics passed to a single File.Write call.
+batch_size = 1000
+
+# Maximum metrics held in the output's buffer. Once full, the oldest
+# metric is evicted (FIFO drop) — visible as Dropped in BufferStats.
+buffer_limit = 10000
+
+
+[[outputs.http_snapshot]]
+# WebUI-facing pull endpoint. Maintains an in-memory map of the latest
+# metric per (name, tags) and serves a JSON snapshot on demand.
+# :9100 matches the node_exporter convention.
+listen = ":9100"
+
+# Flush cadence determines how soon a fresh sample becomes visible to
+# the UI. Lower = fresher, but more buffer→Write churn.
+flush_interval = "500ms"
+batch_size     = 1000
+buffer_limit   = 10000
