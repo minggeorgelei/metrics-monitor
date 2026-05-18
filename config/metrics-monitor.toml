@@ -36,6 +36,11 @@ collect_usage = true
 # Static-ish, so duplicates between gathers; consumer can dedupe.
 collect_cpu_info = true
 
+[[inputs.memory]]
+interval = "1s"
+
+collect_expended = true
+
 
 # ----- outputs --------------------------------------------------------
 
