@@ -39,7 +39,7 @@ collect_cpu_info = true
 [[inputs.memory]]
 interval = "1s"
 
-collect_expended = true
+collect_extended = true
 
 
 # ----- outputs --------------------------------------------------------

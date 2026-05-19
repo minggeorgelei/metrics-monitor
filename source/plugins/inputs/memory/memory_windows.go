@@ -8,6 +8,9 @@ const extendedMemorySupported = true
 
 func getExtendedMemory() (map[string]any, error) {
 	extendedMemory, err := mem.NewExWindows().VirtualMemory()
+	if err != nil {
+		return nil, err
+	}
 	return map[string]any{
 		"commit_limit":    extendedMemory.CommitLimit,
 		"commit_total":    extendedMemory.CommitTotal,
@@ -17,5 +20,5 @@ func getExtendedMemory() (map[string]any, error) {
 		"physical_total":  extendedMemory.PhysTotal,
 		"virtual_avail":   extendedMemory.VirtualAvail,
 		"virtual_total":   extendedMemory.VirtualTotal,
-	}, err
+	}, nil
 }
