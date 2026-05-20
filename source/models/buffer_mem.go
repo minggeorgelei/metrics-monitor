@@ -123,10 +123,9 @@ func (b *MemoryBuffer) EndTransaction(tx *Transaction) {
 			b.buf[current] = tx.Batch[keep[i]]
 			current = b.next(current)
 		}
-		// Metrics that couldn't fit are dropped — they had to go
-		// somewhere, and the buffer can't grow.
+		// Metrics that couldn't fit are dropped — Counted as Dropped
 		if drop := len(keep) - restore; drop > 0 {
-			b.stats.Rejected += int64(drop)
+			b.stats.Dropped += int64(drop)
 		}
 	}
 

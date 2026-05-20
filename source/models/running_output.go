@@ -1,7 +1,7 @@
 package models
 
 import (
-	"log"
+	"log/slog"
 	"time"
 
 	"github.com/minggeorgelei/metrics-monitor/source/core"
@@ -9,6 +9,8 @@ import (
 
 // RunningOutputConfig describes how the agent drives an Output.
 type RunningOutputConfig struct {
+	Name  string
+	Alias string
 	// FlushInterval is the upper bound on how long a metric will sit
 	// in the buffer before the agent attempts to write it.
 	FlushInterval time.Duration
@@ -21,6 +23,11 @@ type RunningOutputConfig struct {
 	// MetricBufferLimit caps the in-memory buffer size. Once full,
 	// new metrics evict the oldest (FIFO drop).
 	MetricBufferLimit int
+
+	// Filter is the per-output selector. Applied in AddMetric:
+	// rejected metrics aren't buffered. Filtered modifications run
+	// on a private copy so they don't affect what other outputs see.
+	Filter Filter
 }
 
 // RunningOutput wraps an Output with its dedicated buffer and the
@@ -29,10 +36,14 @@ type RunningOutputConfig struct {
 // The agent owns the flush goroutine; this struct only exposes:
 //   - AddMetric: ingest from the accumulator/fan-out
 //   - Flush:     drive one Transaction (Begin → Write → End)
+//
+// Log is set by Agent.New with `plugin=outputs.<name>` baked in;
+// defaults to slog.Default() for standalone use.
 type RunningOutput struct {
 	Output core.Output
 	Config RunningOutputConfig
 	Buffer Buffer
+	Log    *slog.Logger
 }
 
 func NewRunningOutput(out core.Output, cfg RunningOutputConfig) *RunningOutput {
@@ -49,12 +60,34 @@ func NewRunningOutput(out core.Output, cfg RunningOutputConfig) *RunningOutput {
 		Output: out,
 		Config: cfg,
 		Buffer: NewMemoryBuffer(cfg.MetricBufferLimit),
+		Log:    slog.Default(),
 	}
 }
 
-// AddMetric enqueues a metric for eventual write.
+// AddMetric enqueues a metric for eventual write. Applies the
+// per-output filter first: rejected metrics never reach the buffer,
+// and the modification step runs on a private copy so it doesn't
+// affect what other outputs see for the same underlying metric.
 func (r *RunningOutput) AddMetric(m *core.Metric) {
+	if !r.Config.Filter.Select(m) {
+		return
+	}
+	if r.Config.Filter.IsActive() {
+		// Copy iff there's any chance Modify will mutate. IsActive
+		// covers both selectActive and modifyActive — selectActive
+		// alone returns from the Select branch above, so reaching
+		// here means modifyActive is on (or both are).
+		m = m.Copy()
+		r.Config.Filter.Modify(m)
+		if len(m.Fields) == 0 {
+			return
+		}
+	}
 	r.Buffer.Add(m)
+}
+
+func (r *RunningOutput) LogName() string {
+	return logName("output", r.Config.Name, r.Config.Alias)
 }
 
 // Flush moves one batch from buffer to output. Returns the error from
@@ -87,10 +120,10 @@ func (r *RunningOutput) Tick() time.Duration { return r.Config.FlushInterval }
 
 func (r *RunningOutput) Close() {
 	if err := r.Output.Close(); err != nil {
-		log.Printf("Error closing output: %v", err)
+		r.Log.Error("close output", "err", err)
 	}
 
 	if err := r.Buffer.Close(); err != nil {
-		log.Printf("Error closing output buffer: %v", err)
+		r.Log.Error("close output buffer", "err", err)
 	}
 }

@@ -1,13 +1,12 @@
 // Package cli is the user-facing entry point. After the move to a
 // TOML-driven plugin pipeline, the only knob worth a CLI flag is the
 // config file location — everything else (plugin choice, intervals,
-// log level) lives in the config.
+// log level/format/file) lives in the config.
 package cli
 
 import (
 	"context"
 	"fmt"
-	"log/slog"
 	"os"
 	"os/signal"
 	"syscall"
@@ -16,6 +15,7 @@ import (
 
 	"github.com/minggeorgelei/metrics-monitor/source/agent"
 	"github.com/minggeorgelei/metrics-monitor/source/config"
+	"github.com/minggeorgelei/metrics-monitor/source/logger"
 )
 
 // CLI is the declarative kong root.
@@ -46,13 +46,30 @@ func (c *RunCmd) Run(*CLI) error {
 		return err
 	}
 
-	log := buildLogger(cfg.LogLevel)
+	// Install the configured logger as slog.Default BEFORE agent.New
+	// runs — agent.New derives per-plugin sub-loggers via With(), so
+	// the format/level chosen here propagates to every plugin.
+	log, closer, err := logger.Setup(logger.Config{
+		Format: cfg.LogFormat,
+		Level:  cfg.LogLevel,
+		File:   cfg.LogFile,
+	})
+	if err != nil {
+		return err
+	}
+	if closer != nil {
+		defer closer.Close()
+	}
+
 	log.Info("config loaded",
 		"path", c.Config,
 		"inputs", len(cfg.Inputs),
+		"processors", len(cfg.Processors),
+		"aggregators", len(cfg.Aggregators),
+		"agg_processors", len(cfg.AggProcessors),
 		"outputs", len(cfg.Outputs))
 
-	a := agent.New(cfg.Agent, cfg.Inputs, cfg.Outputs, log)
+	a := agent.New(cfg.Agent, cfg.Inputs, cfg.Processors, cfg.Aggregators, cfg.AggProcessors, cfg.Outputs, log)
 	if err := a.Validate(); err != nil {
 		return err
 	}
@@ -63,21 +80,4 @@ func (c *RunCmd) Run(*CLI) error {
 	defer stop()
 
 	return a.Run(ctx)
-}
-
-func buildLogger(level string) *slog.Logger {
-	var lvl slog.Level
-	switch level {
-	case "debug":
-		lvl = slog.LevelDebug
-	case "warn":
-		lvl = slog.LevelWarn
-	case "error":
-		lvl = slog.LevelError
-	default:
-		lvl = slog.LevelInfo
-	}
-	// stderr so that file outputs configured for stdout (the default!)
-	// do not collide with the agent's own log lines.
-	return slog.New(slog.NewTextHandler(os.Stderr, &slog.HandlerOptions{Level: lvl}))
 }

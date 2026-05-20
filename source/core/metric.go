@@ -6,7 +6,10 @@
 // pretend to be Telegraf itself.
 package core
 
-import "time"
+import (
+	"maps"
+	"time"
+)
 
 // ValueType describes how a metric's value should be interpreted by
 // downstream consumers (outputs, aggregators).
@@ -37,13 +40,9 @@ type Metric struct {
 // a snapshot must Copy rather than store the original pointer.
 func (m *Metric) Copy() *Metric {
 	tags := make(map[string]string, len(m.Tags))
-	for k, v := range m.Tags {
-		tags[k] = v
-	}
+	maps.Copy(tags, m.Tags)
 	fields := make(map[string]any, len(m.Fields))
-	for k, v := range m.Fields {
-		fields[k] = v
-	}
+	maps.Copy(fields, m.Fields)
 	return &Metric{
 		Name:   m.Name,
 		Tags:   tags,
