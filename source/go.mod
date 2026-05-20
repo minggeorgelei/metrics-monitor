@@ -1,4 +1,4 @@
-module github.com/minggeorgelei/metrics-monitor
+module github.com/minggeorgelei/metrics-monitor/source
 
 go 1.24.4
 

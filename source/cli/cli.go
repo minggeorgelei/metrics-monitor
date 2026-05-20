@@ -24,7 +24,7 @@ type CLI struct {
 }
 
 type RunCmd struct {
-	Config string `help:"Path to the TOML config file." default:"config/metrics-monitor.toml" short:"c"`
+	Config string `help:"Path to the TOML config file." default:"etc/metrics-monitor.toml" short:"c"`
 }
 
 func Run() {

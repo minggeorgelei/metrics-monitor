@@ -7,8 +7,9 @@ metrics-monitor.exe
 coverage.out
 coverage.html
 
-# Vendor dir if anyone runs `go mod vendor` locally.
-/vendor/
+# Vendor dir if anyone runs `go mod vendor` locally. The module root
+# lives at source/, so vendor would land at source/vendor/.
+/source/vendor/
 
 # --- OS / editors ------------------------------------------------------
 .DS_Store
@@ -23,7 +24,8 @@ Thumbs.db
 /tmp/
 *.log
 
-# Local config overrides (the canonical config is config/metrics-monitor.toml,
-# which is committed; ad-hoc overrides for local testing go here).
-config/local.toml
-config/*.local.toml
+# Local config overrides (the canonical config is
+# source/etc/metrics-monitor.toml, which is committed; ad-hoc
+# overrides for local testing go here).
+source/etc/local.toml
+source/etc/*.local.toml
