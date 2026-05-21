@@ -1,6 +1,6 @@
-import { defineConfig } from 'vite'
-import react from '@vitejs/plugin-react'
-import tailwindcss from '@tailwindcss/vite'
+import { defineConfig } from 'vite';
+import react from '@vitejs/plugin-react';
+import tailwindcss from '@tailwindcss/vite';
 
 // Proxy /api → http://localhost:9100 so the dev server fetches stay
 // same-origin and we don't need CORS in development. The agent's
@@ -17,4 +17,4 @@ export default defineConfig({
       '/healthz': 'http://localhost:9100',
     },
   },
-})
+});

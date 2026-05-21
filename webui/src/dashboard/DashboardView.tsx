@@ -93,7 +93,9 @@ function DashboardViewInner({ dashboardId }: Props) {
   return (
     <div className="relative">
       {dashboard.description && (
-        <p className="mx-1 mb-3.5 text-sm text-muted">{dashboard.description}</p>
+        <p className="mx-1 mb-3.5 text-sm text-muted">
+          {dashboard.description}
+        </p>
       )}
 
       <ResponsiveGridLayout

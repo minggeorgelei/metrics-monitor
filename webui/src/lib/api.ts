@@ -41,7 +41,7 @@ export async function fetchSnapshot(
 ): Promise<Snapshot> {
   let url = '/api/v1/metrics';
   if (names && names.length > 0) {
-    url += `?names=${encodeURIComponent(names.join(','))}`;
+    url += `?names=${names.map(encodeURIComponent).join(',')}`;
   }
   const res = await fetch(url, { signal });
   if (!res.ok) {
