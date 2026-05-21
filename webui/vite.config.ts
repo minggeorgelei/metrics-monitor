@@ -1,5 +1,6 @@
 import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
+import tailwindcss from '@tailwindcss/vite'
 
 // Proxy /api → http://localhost:9100 so the dev server fetches stay
 // same-origin and we don't need CORS in development. The agent's
@@ -9,7 +10,7 @@ import react from '@vitejs/plugin-react'
 //
 // https://vite.dev/config/
 export default defineConfig({
-  plugins: [react()],
+  plugins: [react(), tailwindcss()],
   server: {
     proxy: {
       '/api': 'http://localhost:9100',

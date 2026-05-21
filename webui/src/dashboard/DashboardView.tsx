@@ -79,7 +79,7 @@ function DashboardViewInner({ dashboardId }: Props) {
 
   if (!dashboard) {
     return (
-      <div className="page-status page-status--error">
+      <div className="py-20 text-center text-[15px] text-red-700">
         unknown dashboard "{dashboardId}"
       </div>
     );
@@ -91,9 +91,9 @@ function DashboardViewInner({ dashboardId }: Props) {
   };
 
   return (
-    <div className="dashboard-view">
+    <div className="relative">
       {dashboard.description && (
-        <p className="dashboard-view__description">{dashboard.description}</p>
+        <p className="mx-1 mb-3.5 text-sm text-muted">{dashboard.description}</p>
       )}
 
       <ResponsiveGridLayout
@@ -103,14 +103,14 @@ function DashboardViewInner({ dashboardId }: Props) {
         cols={COLS}
         rowHeight={ROW_HEIGHT}
         margin={MARGIN}
-        draggableHandle=".panel__heading"
+        draggableHandle=".panel-heading"
         onLayoutChange={handleLayoutChange}
         compactType="vertical"
       >
         {dashboard.panels.map((dp) => {
           const group = groupByPanelId.get(dp.panelId);
           return (
-            <div key={dp.panelId} className="dashboard-grid__cell">
+            <div key={dp.panelId}>
               <PanelHost panelId={dp.panelId} group={group} />
             </div>
           );
@@ -162,7 +162,7 @@ function PanelHost({ panelId, group }: PanelHostProps) {
 
   if (!panel) {
     return (
-      <div className="page-status page-status--error">
+      <div className="py-20 text-center text-[15px] text-red-700">
         panel "{panelId}" not registered
       </div>
     );
@@ -170,7 +170,7 @@ function PanelHost({ panelId, group }: PanelHostProps) {
 
   if (error) {
     return (
-      <div className="page-status page-status--error">
+      <div className="py-20 text-center text-[15px] text-red-700">
         {panel.title}: {error.message}
       </div>
     );

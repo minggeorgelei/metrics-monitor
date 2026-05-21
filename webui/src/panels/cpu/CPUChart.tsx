@@ -157,10 +157,12 @@ export function CPUChart({ cpuMetrics }: Props) {
   }, [cpuMetrics, chartRef]);
 
   return (
-    <div className="chart-frame">
-      <div ref={containerRef} className="cpu-chart" />
+    <div className="relative min-h-0 flex-1 px-3 pb-4 pt-3">
+      <div ref={containerRef} className="h-full w-full" />
       {!hasData && (
-        <div className="chart-empty">waiting for CPU usage samples...</div>
+        <div className="pointer-events-none absolute inset-3 grid place-items-center text-[15px] text-muted">
+          waiting for CPU usage samples...
+        </div>
       )}
     </div>
   );

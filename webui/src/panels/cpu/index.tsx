@@ -19,21 +19,15 @@ export function CPUPanel({ metrics }: PanelProps) {
   const summary = summarize(cpuMetrics);
 
   const actions = (
-    <dl className="stats">
-      <div>
-        <dt>Total</dt>
-        <dd>{formatPercent(summary.totalBusy)}</dd>
-      </div>
-      <div>
-        <dt>Cores</dt>
-        <dd>{summary.coreCount || '-'}</dd>
-      </div>
-      <div>
-        <dt>Sample</dt>
-        <dd>
-          {summary.sampleTime ? summary.sampleTime.toLocaleTimeString() : '-'}
-        </dd>
-      </div>
+    <dl className="m-0 grid grid-cols-[minmax(96px,1fr)_minmax(96px,1fr)_minmax(126px,1.15fr)] gap-2.5 max-[760px]:grid-cols-1">
+      <Stat label="Total" value={formatPercent(summary.totalBusy)} />
+      <Stat label="Cores" value={summary.coreCount || '-'} />
+      <Stat
+        label="Sample"
+        value={
+          summary.sampleTime ? summary.sampleTime.toLocaleTimeString() : '-'
+        }
+      />
     </dl>
   );
 
@@ -45,6 +39,19 @@ export function CPUPanel({ metrics }: PanelProps) {
     >
       <CPUChart cpuMetrics={cpuMetrics} />
     </PanelShell>
+  );
+}
+
+function Stat({ label, value }: { label: string; value: string | number }) {
+  return (
+    <div className="min-w-0 rounded-md border border-line bg-bg px-2.5 py-2">
+      <dt className="text-xs font-bold uppercase leading-tight text-muted">
+        {label}
+      </dt>
+      <dd className="mt-1 overflow-hidden text-ellipsis whitespace-nowrap font-mono text-[15px] leading-tight text-fg-strong">
+        {value}
+      </dd>
+    </div>
   );
 }
 

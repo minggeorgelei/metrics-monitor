@@ -40,16 +40,19 @@ export function TopNav() {
   });
 
   return (
-    <header className="topnav">
-      <div className="topnav__brand">metrics-monitor</div>
-      <nav className="topnav__tabs">
+    <header className="sticky top-0 z-10 flex items-center gap-6 border-b border-line bg-surface px-6 py-3 max-[760px]:gap-4 max-[760px]:px-4 max-[760px]:py-2.5">
+      <div className="whitespace-nowrap text-base font-bold tracking-tight text-fg-strong">
+        metrics-monitor
+      </div>
+      <nav className="flex min-w-0 flex-1 gap-1 overflow-x-auto [scrollbar-width:thin]">
         {TABS.map((t) => (
           <NavLink
             key={t.path}
             to={t.path}
             end={t.end}
             className={({ isActive }) =>
-              'topnav__tab' + (isActive ? ' topnav__tab--active' : '')
+              'whitespace-nowrap rounded-md px-3 py-1.5 text-sm font-medium no-underline transition-colors duration-100 hover:bg-bg hover:text-fg-strong' +
+              (isActive ? ' bg-bg font-semibold text-fg-strong' : ' text-muted')
             }
           >
             {t.label}
@@ -65,6 +68,9 @@ export function TopNav() {
   );
 }
 
+const BADGE_BASE =
+  'inline-flex items-center whitespace-nowrap rounded-full px-2.5 py-1 font-mono text-[13px]';
+
 function ConnectionBadge({
   timestamp,
   error,
@@ -75,11 +81,21 @@ function ConnectionBadge({
   isPending: boolean;
 }) {
   if (isPending)
-    return <span className="badge badge--pending">connecting…</span>;
-  if (error) return <span className="badge badge--error">error</span>;
+    return (
+      <span className={`${BADGE_BASE} bg-blue-600/10 text-blue-700`}>
+        connecting…
+      </span>
+    );
+  if (error)
+    return (
+      <span className={`${BADGE_BASE} bg-red-600/10 text-red-700`}>error</span>
+    );
   if (timestamp) {
     return (
-      <span className="badge badge--ok" title={timestamp}>
+      <span
+        className={`${BADGE_BASE} bg-green-600/10 text-green-700`}
+        title={timestamp}
+      >
         live · {new Date(timestamp).toLocaleTimeString()}
       </span>
     );

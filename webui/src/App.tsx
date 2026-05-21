@@ -3,7 +3,6 @@ import { BrowserRouter, Route, Routes } from 'react-router-dom';
 import { TopNav } from './nav/TopNav';
 import { OverviewPage } from './pages/OverviewPage';
 import { PlaceholderPage } from './pages/PlaceholderPage';
-import './App.css';
 
 /**
  * App is now a thin router shell. Every dashboard is a route below;
@@ -13,9 +12,9 @@ import './App.css';
 export default function App() {
   return (
     <BrowserRouter>
-      <div className="app">
+      <div className="flex min-h-screen flex-col">
         <TopNav />
-        <main className="page">
+        <main className="mx-auto w-[min(1180px,calc(100vw-40px))] flex-1 pb-12 pt-7 max-[760px]:w-[min(100%-24px,1180px)] max-[760px]:pb-8 max-[760px]:pt-[22px]">
           <Routes>
             <Route path="/" element={<OverviewPage />} />
             <Route

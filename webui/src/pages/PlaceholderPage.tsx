@@ -14,10 +14,14 @@ export function PlaceholderPage({
   description = "This dashboard isn't built yet — the supporting input plugin will land in a later phase. The route is reserved so the navigation experience stays consistent.",
 }: Props) {
   return (
-    <div className="placeholder">
-      <h1>{title}</h1>
-      <p className="placeholder__lede">Coming soon</p>
-      <p className="placeholder__body">{description}</p>
+    <div className="mx-auto my-20 max-w-[560px] text-center">
+      <h1 className="mb-3 text-[34px] font-bold leading-[1.08] tracking-normal text-fg-strong max-[760px]:text-[28px]">
+        {title}
+      </h1>
+      <p className="mb-4 text-[15px] font-semibold uppercase tracking-[0.08em] text-muted">
+        Coming soon
+      </p>
+      <p className="text-[15px] leading-[1.55] text-muted">{description}</p>
     </div>
   );
 }
